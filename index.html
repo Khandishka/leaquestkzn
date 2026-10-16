@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Тайна трёх символов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#0d1b33; --deep:#08122436; --ink:#0a1528;
+  --gold:#d9b879; --gold-soft:#d9b87955; --cream:#f3e9d2; --cream-dim:#f3e9d2b3;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;min-height:100%;color:var(--cream);
+  font-family:'Lora',Georgia,serif;font-size:18px;line-height:1.7;
+  background:
+    radial-gradient(ellipse at 50% -10%,#1b335c 0%,transparent 60%),
+    var(--night);
+  -webkit-text-size-adjust:100%;
+}
+/* old-map texture: fine paper grain + faint contour lines */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .85 0 0 0 0 .72 0 0 0 0 .47 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' fill='none' stroke='%23d9b879' stroke-opacity='.07'%3E%3Cpath d='M-20 80C60 40 120 130 200 90S300 50 330 80'/%3E%3Cpath d='M-20 120C60 80 120 170 200 130S300 90 330 120'/%3E%3Cpath d='M-20 220C70 190 140 260 220 230S300 200 330 215'/%3E%3C/svg%3E");
+}
+main{position:relative;max-width:30rem;margin:0 auto;padding:2.5rem 1.6rem 4rem;min-height:100svh;display:flex;flex-direction:column;justify-content:center}
+.page{display:none}
+.page.on{display:block;animation:soft 1.6s ease both}
+@keyframes soft{from{opacity:0}to{opacity:1}}
+h1,h2{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;color:var(--gold);line-height:1.15;margin:0 0 1.6rem;letter-spacing:.01em}
+h1{font-size:2.7rem}
+h2{font-size:2.1rem}
+p{margin:0 0 1.5rem}
+.dim{color:var(--cream-dim)}
+.frag{
+  font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:1.35rem;line-height:1.4;
+  color:var(--gold);border-left:1px solid var(--gold-soft);padding-left:1rem;margin:2rem 0;
+}
+.btn{
+  appearance:none;border:1px solid var(--gold);background:transparent;color:var(--gold);
+  font:inherit;font-size:1.05rem;padding:.9rem 1.6rem;border-radius:999px;min-height:3rem;
+  width:100%;cursor:pointer;transition:background .3s,color .3s;
+}
+.btn:hover,.btn:focus-visible{background:var(--gold);color:var(--ink);outline:none}
+.btn:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+.ask{display:flex;flex-direction:column;gap:.9rem;margin-top:2rem}
+input{
+  font:inherit;font-size:1.15rem;color:var(--cream);text-align:center;
+  background:#ffffff0a;border:0;border-bottom:1px solid var(--gold);border-radius:6px 6px 0 0;
+  padding:.85rem 1rem;min-height:3rem;width:100%;
+}
+input::placeholder{color:#f3e9d255}
+input:focus{outline:none;background:#ffffff14}
+input:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px}
+.err{min-height:1.7rem;margin:0;color:var(--cream-dim);font-style:italic;text-align:center;font-size:1rem;opacity:0;transition:opacity .5s}
+.err.show{opacity:1}
+.ok{display:none}
+.ok.on{display:block;animation:soft 1.4s ease both}
+.ask.done{display:none}
+.lead{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.5rem;color:var(--gold);margin-bottom:1rem}
+
+/* finale: still water */
+#p4::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 14% at 50% 78%,#d9b87938,transparent 70%),
+    radial-gradient(ellipse 30% 5% at 50% 80%,#f3e9d226,transparent 70%),
+    repeating-linear-gradient(180deg,transparent 0 22px,#d9b87908 22px 23px),
+    linear-gradient(180deg,#0d1b33 0%,#0a1830 55%,#0c2140 100%);
+  animation:ripple 12s ease-in-out infinite alternate;
+}
+@keyframes ripple{from{transform:translateY(0) scaleY(1)}to{transform:translateY(-6px) scaleY(1.02)}}
+.dots{position:fixed;inset:0;pointer-events:none;z-index:-1}
+.dots i{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--gold);opacity:.35;animation:tw 6s ease-in-out infinite alternate}
+@keyframes tw{from{opacity:.12}to{opacity:.6}}
+.line{opacity:0;animation:soft 2.2s ease forwards}
+.final strong{display:block;font-family:'Cormorant Garamond',Georgia,serif;font-size:1.9rem;line-height:1.3;color:var(--gold);font-weight:600;margin-top:.4rem}
+#star{
+  appearance:none;border:0;background:none;color:var(--gold);font-size:1.1rem;opacity:.7;
+  margin:3rem auto 0;display:block;padding:1rem;min-width:3rem;min-height:3rem;cursor:pointer;
+}
+#star:focus-visible{outline:2px solid var(--gold-soft);border-radius:50%}
+#p5{position:relative}
+.seq{opacity:0;transition:opacity 3s ease}
+.seq.in{opacity:1}
+.wait{position:absolute;left:0;top:0;display:flex;gap:8px;opacity:0;transition:opacity 1.2s ease;pointer-events:none}
+.wait.on{opacity:1}
+.wait i{width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:.15;animation:breathe 2.4s ease-in-out infinite}
+.wait i:nth-child(2){animation-delay:.4s}
+.wait i:nth-child(3){animation-delay:.8s}
+@keyframes breathe{0%,100%{opacity:.15}50%{opacity:.85}}
+@media (prefers-reduced-motion:reduce){.seq{opacity:1;transition:none}.wait{display:none}}
+@media (prefers-reduced-motion:reduce){
+  .page.on,.ok.on,.line,#p4::before,.dots i{animation:none;opacity:1}
+}
+</style>
+</head>
+<body>
+<div class="dots" id="dots" aria-hidden="true"></div>
+<main>
+
+<section class="page on" id="p0">
+  <h1>Тайна трёх символов</h1>
+  <p>Есть города, которые можно просто увидеть.<br>А есть те, которые отвечают, если задать правильный вопрос.</p>
+  <p>Сегодня Казань оставила для нас три знака:<br>путь, высоту и свет.</p>
+  <p>Они не спрятаны.<br>Они давно стоят на своих местах и ждут, когда мы их заметим.</p>
+  <button class="btn" data-go="p1" style="margin-top:1rem">Начать</button>
+</section>
+
+<section class="page" id="p1" data-answers="карета|карета екатерины|карета екатерины второй|карета екатерины ii|карета екатерины 2">
+  <h2>Первый знак — Путь</h2>
+  <p>Она не поедет, даже если очень попросить.<br>Но именно с неё когда-то начиналась дорога.</p>
+  <p>Она помнит императрицу<br>и стоит на улице, где город всегда куда-то идёт.</p>
+  <p>Найди её.</p>
+  <div class="ask">
+    <input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" placeholder="ответ">
+    <button class="btn check">Ответить</button>
+    <p class="err" role="status">Почти. Город любит тех, кто не торопится ✨</p>
+  </div>
+  <div class="ok">
+    <p class="lead">Первый знак найден.</p>
+    <p>Путь — это не расстояние.<br>Это решение однажды пойти не туда, куда обычно.</p>
+    <div class="frag">«Путь привёл нас сюда».</div>
+    <button class="btn" data-go="p2">Искать второй знак</button>
+  </div>
+</section>
+
+<section class="page" id="p2" data-answers="7|семь">
+  <h2>Второй знак — Высота</h2>
+  <p>Второй знак находится там,<br>где стены помнят больше, чем улицы.</p>
+  <p>Он смотрит на город<br>чуть под другим углом.</p>
+  <p>Мы идём туда,<br>где нужно поднять голову.</p>
+  <p>Не считай этажи зданий вокруг.<br>Считай только ступени самой башни,<br>которые уходят в небо.</p>
+  <p class="dim">Введи число, когда будешь уверена.</p>
+  <div class="ask">
+    <input type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" placeholder="число">
+    <button class="btn check">Ответить</button>
+    <p class="err" role="status">Почти. Город любит тех, кто не торопится ✨</p>
+  </div>
+  <div class="ok">
+    <p class="lead">Второй знак найден.</p>
+    <p>Высота нужна не для того,<br>чтобы быть выше других.</p>
+    <p>Иногда она нужна,<br>чтобы увидеть привычное иначе.</p>
+    <div class="frag">«Высота помогла увидеть город иначе».</div>
+    <button class="btn" data-go="p3">Искать последний знак</button>
+  </div>
+</section>
+
+<section class="page" id="p3" data-answers="матур">
+  <h2>Третий знак — Свет</h2>
+  <p>Последний знак нельзя потрогать.<br>Его не видно в окнах и фонарях.</p>
+  <p>Иногда свет появляется в одном простом моменте:<br>когда тебя слышат, даже если ты говоришь почти шёпотом.</p>
+  <p>Найди арку, где расстояние не мешает двум людям услышать друг друга.</p>
+  <p>Когда окажетесь у арки, встаньте по разные её стороны.</p>
+  <p>Один должен прошептать слово.<br>Другой — услышать его.</p>
+  <p class="dim">Введи слово, которое услышишь.</p>
+  <div class="ask">
+    <input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" placeholder="услышанное слово">
+    <button class="btn check">Ответить</button>
+    <p class="err" role="status">Почти. Город любит тех, кто не торопится ✨</p>
+  </div>
+  <div class="ok">
+    <p class="lead">Ты услышала.<br>Значит, последний знак найден.</p>
+    <p>Свет — это не то, что видно издалека.<br>Иногда он появляется, когда тебя действительно слышат.</p>
+    <div class="frag">«Свет напомнил, что самое важное не прячется в загадках».</div>
+    <button class="btn" data-go="p4">Открыть послание</button>
+  </div>
+</section>
+
+<section class="page final" id="p4">
+  <p class="line" style="animation-delay:.4s">Путь привёл нас сюда.<br>Высота помогла увидеть город иначе.<br>Свет напомнил, что самое важное не прячется в загадках.</p>
+  <p class="line" style="animation-delay:3s">Я хотел устроить это маленькое приключение, чтобы провести этот вечер именно с тобой.</p>
+  <p class="line" style="animation-delay:5.5s">И, кажется, главная тайна трёх символов проста:</p>
+  <p class="line" style="animation-delay:8.5s"><strong>Лучшие маршруты — те, в которых есть Ты.</strong></p>
+  <button id="star" class="line" style="animation-delay:12.5s" data-go="p5" aria-label="Ещё">✦</button>
+</section>
+
+<section class="page hid" id="p5">
+  <h2 class="seq">Это ещё не всё</h2>
+  <p class="seq lead"><strong style="font-weight:600">Четвёртый знак — Неожиданность</strong></p>
+  <p class="seq">Три знака привели нас сюда.<br>Но у каждого хорошего маршрута есть поворот,<br>которого нет ни на одной карте.</p>
+  <p class="seq">Иногда нужно просто довериться человеку рядом.</p>
+  <p class="seq">Побудь здесь немного.<br>Кажется, для тебя есть ещё один знак.</p>
+  <p class="seq dim" style="margin-top:3rem;text-align:center;font-size:.95rem;font-style:italic">И да, теперь можно оглянуться.</p>
+  <div class="wait" id="wait" aria-hidden="true"><i></i><i></i><i></i></div>
+</section>
+
+</main>
+<script>
+(function(){
+  var norm=function(s){return s.toLowerCase().replace(/ё/g,'е').replace(/[\s\-‐‑–—]+/g,'')};
+  function show(id){
+    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on')});
+    var el=document.getElementById(id);el.classList.add('on');
+    window.scrollTo(0,0);
+    var inp=el.querySelector('input');
+  }
+  document.querySelectorAll('[data-go]').forEach(function(b){
+    b.addEventListener('click',function(){show(b.getAttribute('data-go'))});
+  });
+  document.querySelectorAll('section[data-answers]').forEach(function(sec){
+    var ok=sec.getAttribute('data-answers').split('|').map(norm);
+    var inp=sec.querySelector('input'),err=sec.querySelector('.err');
+    function check(){
+      if(ok.indexOf(norm(inp.value))>-1){
+        sec.querySelector('.ask').classList.add('done');
+        var o=sec.querySelector('.ok');o.classList.add('on');
+        inp.blur();
+        setTimeout(function(){o.scrollIntoView({behavior:'smooth',block:'center'})},50);
+      }else{
+        err.classList.add('show');
+      }
+    }
+    sec.querySelector('.check').addEventListener('click',check);
+    inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();check()}});
+    inp.addEventListener('input',function(){err.classList.remove('show')});
+  });
+  var started=false;
+  document.getElementById('star').addEventListener('click',function(){
+    if(started)return;started=true;
+    var seq=[].slice.call(document.querySelectorAll('#p5 .seq')),wait=document.getElementById('wait');
+    if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){seq.forEach(function(e){e.classList.add('in')});return}
+    var gaps=[3200,3500,5000,4500,5500],t=500;
+    seq.forEach(function(el,i){
+      setTimeout(function(){el.classList.add('in');wait.classList.remove('on')},t);
+      if(i<seq.length-1){
+        setTimeout(function(){
+          wait.style.top=(el.offsetTop+el.offsetHeight+10)+'px';
+          wait.classList.add('on');
+        },t+1500);
+        t+=gaps[i];
+      }
+    });
+  });
+  var d=document.getElementById('dots'),h='';
+  for(var i=0;i<14;i++){
+    h+='<i style="left:'+(8+Math.random()*84).toFixed(1)+'%;top:'+(62+Math.random()*34).toFixed(1)+'%;animation-delay:-'+(Math.random()*6).toFixed(1)+'s"></i>';
+  }
+  d.innerHTML=h;
+  d.style.display='none';
+  var obs=new MutationObserver(function(){d.style.display=document.getElementById('p4').classList.contains('on')||document.getElementById('p5').classList.contains('on')?'block':'none'});
+  document.querySelectorAll('.page').forEach(function(p){obs.observe(p,{attributes:true,attributeFilter:['class']})});
+})();
+</script>
+</body>
+</html>
